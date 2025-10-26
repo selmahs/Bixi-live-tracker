@@ -53,4 +53,38 @@ def get_center(df=df):
         return [float(df["lat"].mean()), float(df["lon"].mean())]
  
 center = get_center()
+m = folium.Map(location=center, zoom_start=13, tiles="cartodbpositron", control_scale=True)
+use_clusters = st.sidebar.checkbox("Grouper les points (clusters)", value=True)
+layer = MarkerCluster().add_to(m) if use_clusters else m
 
+for _, row in df.iterrows():
+    name = row.get("name", "Station")
+    lat = float(row["lat"])
+    lon = float(row["lon"])
+    capacity = row.get("capacity", None)
+    bikes = int(row.get("num_bikes_available", 0))
+    docks = int(row.get("num_docks_available", 0))
+
+    popup_html = (
+        f"<b>{name}</b><br>"
+        f"Vélos dispo : {bikes}<br>"
+        f"Bornes libres : {docks}<br>"
+        f"Capacité : {capacity if pd.notna(capacity) else 'N/A'}"
+    )
+
+    folium.CircleMarker(
+        location=[lat, lon],
+        color=choose_station_color(bikes, orange_max),
+        fill=True,
+        fill_opacity=0.85,
+        popup=popup_html,
+    ).add_to(layer)
+
+st_folium(m, width=680, height=None)
+
+with st.expander("Voir le tableau brut"):
+    cols = ["name", "lat", "lon", "capacity", "num_bikes_available", "num_docks_available", "is_renting", "last_reported"]
+    cols = [c for c in cols if c in df.columns]
+    st.dataframe(df[cols].sort_values("num_bikes_available", ascending=False), use_container_width=True)
+
+st.sidebar.button("🔄 Rafraîchir maintenant", on_click=st.experimental_rerun)
