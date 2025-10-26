@@ -28,8 +28,15 @@ def fetch_json(url: str) -> dict:
     response.raise_for_status()
     return response.json()
 
-def load_data(feeds: dict) -> pd.DataFrame:
-    pass 
+#charge les données des stations et retourne un DataFrame fusionné avec les informations et le statut des stations
+def load_data() -> pd.DataFrame:
+    feeds = getFeeds()  
+    info = fetch_json(feeds["station_information"]) 
+    status = fetch_json(feeds["station_status"])
+    df_info = pd.DataFrame(info["data"]["stations"])
+    df_status = pd.DataFrame(status["data"]["stations"])
+    df_merged = pd.merge(df_info, df_status, on="station_id", how="inner")
+    return df_merged
 
 def choose_station_color(bikes_available: int, orange_max: int = ORANGE_MAX) -> str:
     if bikes_available== 0:
@@ -37,3 +44,6 @@ def choose_station_color(bikes_available: int, orange_max: int = ORANGE_MAX) -> 
     if 1 <= bikes_available <= orange_max:
         return "orange"
     return "green"
+
+
+
