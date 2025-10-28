@@ -14,8 +14,7 @@ from typing import  Dict, List,Sequence, Tuple, Optional
 #retourne un dictionnaire avec les noms des flux et leurs URL à partir de l'index GBFS: {feed_name: feed_url}
 @st.cache_data(ttl=CACHE_TTL, show_spinner=False)
 def getFeeds(index_url=GBFS_INDEX, lang= "fr")-> dict:
-    r = requests.get(index_url, timeout=20)
-    response = requests.get(GBFS_INDEX, timeout=20)
+    response = requests.get(index_url, timeout=20)
     response.raise_for_status()
     root = response.json()
 
@@ -126,7 +125,8 @@ def geocode(address: str)-> Tuple[float, float]|str:
         r.raise_for_status()
         results = r.json()
         if not results:
-            return [float(results[0]["lat"]), float(results[0]["lon"])]
+            return ''
+        return float(results[0]["lat"]), float(results[0]["lon"])
     except Exception:
         return ''
 
@@ -158,7 +158,7 @@ def get_bike_availability(user_location: Sequence[float], stations_df: pd.DataFr
 
     for i, station in stations_df.iterrows():
         if not bike_types:
-            has_available_bikes = station["num_bikes_available"]>0
+            has_required_bike = station["num_bikes_available"] > 0
         else:
             needs_ebike = "ebike" in bike_types
             needs_mech = "mechanical" in bike_types
@@ -173,13 +173,6 @@ def get_bike_availability(user_location: Sequence[float], stations_df: pd.DataFr
         if distance < min_distance:
             min_distance = distance
             nearest_station = (station["station_id"], station["lat"], station["lon"])
-
-        if nearest_station is None:
-            for _, station in stations_df[stations_df["num_bikes_available"] > 0].iterrows():
-                distance = calculate_distance(user_location, (station["lat"], station["lon"]))
-                if distance < best_distance:
-                    best_distance = distance
-                    nearest_station = (station["station_id"], float(station["lat"]), float(station["lon"]))
 
     return nearest_station
 
@@ -242,5 +235,3 @@ def enrich_modes(df: pd.DataFrame) -> pd.DataFrame:
     pass
 
 """
-
-
