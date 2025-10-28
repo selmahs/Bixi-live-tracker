@@ -179,9 +179,9 @@ def get_bike_availability(user_location: Sequence[float], stations_df: pd.DataFr
                 distance = calculate_distance(user_location, (station["lat"], station["lon"]))
                 if distance < best_distance:
                     best_distance = distance
-                    nearest = (station["station_id"], float(station["lat"]), float(station["lon"]))
+                    nearest_station = (station["station_id"], float(station["lat"]), float(station["lon"]))
 
-        return nearest_station
+    return nearest_station
 
 # Trouve la station la plus proche avec au moins un ancrage libre.
 # Retour: (station_id, lat, lon) ou None.
