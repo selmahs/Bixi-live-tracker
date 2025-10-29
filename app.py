@@ -26,10 +26,10 @@ for i in ['lat', 'lon']:
 col1, col2, col3 = st.columns(3)
 with col1: 
     st.metric(label="Vélos disponibles maintenant", value=int(data["num_bikes_available"].sum()))
-    st.metric(label="Vélos électriques disponibles maintenant", value=int(data["ebike"].sum()))
+    st.metric(label="Vélos électriques disponibles maintenant", value=int(status_df["num_ebikes_available"].sum()))
 with col2:
     st.metric(label="Stations avec vélos disponibles", value=int((data["num_bikes_available"] > 0).sum()))
-    st.metric(label="Stations avec vélos électriques disponibles", value=int((data["ebike"] > 0).sum()))
+    st.metric(label="Stations avec vélos électriques disponibles", value=int((status_df["num_ebikes_available"] > 0).sum()))
 with col3:
     st.metric(label="Stations avec bornes disponibles", value=int((data["num_docks_available"] > 0).sum()))
 

@@ -145,8 +145,6 @@ def calculate_distance(coord1: Sequence[float], coord2: Sequence[float]) -> floa
 
     return distance
 
-
-
 #   Trouve la station la plus proche qui respecte la demande:  
 #   - bike_types peut contenir 'ebike' et/ou 'mechanical';
 #   - si vide, n'importe quel vélo (>0) convient.
