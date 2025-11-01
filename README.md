@@ -60,7 +60,10 @@ station_information.json → contient les métadonnées de chaque station (nom, 
 station_status.json → fournit l’état en temps réel des stations (vélos disponibles, bornes libres, types de vélos, etc.)
 
 ## Fonctionnalités principales
-![Aperçu du site](./apercuSite.png)
+<h2 align="center">🌍 Aperçu du site</h2>
+<p align="center">
+  <img src="./apercuSite.png" alt="Aperçu du site BIXI Live Tracker" width="600">
+</p>
 ###  🗺️Carte interactive
 Affiche toutes les stations BIXI avec un code couleur : rouge (aucun vélo), orange (peu de vélos), vert (disponibilité normale).
 ### 🚲 Séparation e-bike / mécanique
