@@ -1,11 +1,12 @@
 # Bixi-live-tracker
 
-## Ce que le projet fait
+## Aperçu du projet
 
-<h2 align="center">🌍 Aperçu du site</h2>
 <p align="center">
   <img src="./apercuSite.png" alt="Aperçu du site BIXI Live Tracker" width="600">
 </p>
+
+## Ce que le projet fait
 
 BIXI Live Tracker est un site web interactif construit avec Streamlit.
 Il affiche en temps réel la disponibilité des vélos dans les stations BIXI de Montréal, à partir du flux officiel GBFS (General Bikeshare Feed Specification).<br>
