@@ -4,6 +4,7 @@ import time
 import math
 import folium
 import streamlit as st
+import joblib
 import json
 import urllib.request
 import datetime as dt
@@ -217,6 +218,42 @@ def run_osrm(selected_station: Tuple[str, float, float] | None, user_location: S
     except Exception:
         return [], None
 
+_MODEL_CACHE = None
+
+
+def load_demand_model(path: str = "model.pkl"):
+    """Charge le modèle entraîné (mis en cache pour éviter de le recharger)."""
+    global _MODEL_CACHE
+    if _MODEL_CACHE is None:
+        _MODEL_CACHE = joblib.load(path)
+    return _MODEL_CACHE
+
+
+def predict_hourly_demand(station_name: str, target_datetime: dt.datetime, model_path: str = "model.pkl") -> float:
+    """
+    Prédit le nombre de départs de vélos attendus pour une station donnée
+    (identifiée par son nom, comme dans les données d'entraînement),
+    à une heure donnée.
+    """
+    bundle = load_demand_model(model_path)
+    model = bundle["model"]
+    feature_columns = bundle["feature_columns"]
+    station_categories = bundle["station_categories"]
+
+    row = {
+        "hour": target_datetime.hour,
+        "day_of_week": target_datetime.weekday(),
+        "month": target_datetime.month,
+        "is_weekend": int(target_datetime.weekday() in (5, 6)),
+        "station_id": station_name,
+    }
+    X = pd.DataFrame([row])[feature_columns]
+    X["station_id"] = pd.Categorical(X["station_id"], categories=station_categories)
+
+    if X["station_id"].isna().any():
+        raise ValueError(f"Station inconnue du modèle : '{station_name}'.")
+
+    return float(model.predict(X)[0])
 
 """
 def choose_station_color(bikes_available: int, orange_max: int = ORANGE_MAX) -> str:

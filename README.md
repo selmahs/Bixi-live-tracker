@@ -19,15 +19,18 @@ Le site permet de :<br>
 
 - Trouver la station la plus proche pour louer ou retourner un vélo.<br>
 
-- Consulter des indicateurs clés sur la flotte BIXI en direct.<br> 
+- Consulter des indicateurs clés sur la flotte BIXI en direct.<br>
+
+- Prédire la demande horaire de vélos par station à partir de l'historique des trajets.<br>
 
 ## Pourquoi le projet est utile
 
 Ce projet permet de visualiser en temps réel la disponibilité des vélos BIXI à Montréal.
 Il facilite la planification des déplacements urbains en aidant les utilisateurs à trouver rapidement une station avec des vélos ou des bornes libres à proximité.
-Le projet permet aussi de choisir entre un vélo mécanique ou un e-bike, afin d’afficher seulement les stations qui en offrent.
+Le projet permet aussi de choisir entre un vélo mécanique ou un e-bike, afin d'afficher seulement les stations qui en offrent.
+La fonctionnalité de prédiction aide en plus à anticiper les heures de forte demande à une station donnée, avant même de s'y déplacer.
 
-## Prise en main du projet 
+## Prise en main du projet
 
 <ins> Installation :</ins> <br>
 
@@ -53,37 +56,56 @@ streamlit run app.py
 Le site sera accessible sur<br>
 👉 http://localhost:8501
 
-## Données exploité
+<ins>Entraîner le modèle de prédiction (optionnel) :</ins> <br>
+
+Un modèle pré-entraîné (`model.pkl`) est nécessaire pour que la section prédiction de l'application fonctionne. Pour le générer :
+
+```
+# Télécharger les données de trajets historiques sur https://bixi.com/en/open-data/
+# et placer le(s) fichier(s) CSV dans le dossier data/
+
+python train_model.py --data-dir data --output model.pkl
+```
+
+## Données exploitées
+
 Le site repose sur des données ouvertes fournies par BIXI Montréal via la spécification GBFS (General Bikeshare Feed Specification) — un standard mondial utilisé par la plupart des services de vélopartage.<br>
 
-📡 Source principale :<br>
+📡 Source principale (temps réel) :<br>
 GBFS_INDEX = "https://gbfs.velobixi.com/gbfs/2-2/gbfs.json"<br>
 
 Cette URL agit comme un index qui liste tous les flux JSON publics disponibles (sous licence open data), notamment :
 
 station_information.json → contient les métadonnées de chaque station (nom, coordonnées, capacité totale, etc.)
 
-station_status.json → fournit l’état en temps réel des stations (vélos disponibles, bornes libres, types de vélos, etc.)
+station_status.json → fournit l'état en temps réel des stations (vélos disponibles, bornes libres, types de vélos, etc.)
+
+📊 Source pour la prédiction (historique) :<br>
+Le modèle de prédiction de la demande est entraîné sur les données de trajets historiques publiées annuellement par BIXI sur [bixi.com/en/open-data](https://bixi.com/en/open-data/).
 
 ## Fonctionnalités principales
 
-### 🗺️ Carte interactive  
+### 🗺️ Carte interactive
 Affiche toutes les stations BIXI avec un code couleur : rouge (aucun vélo), orange (peu de vélos), vert (disponibilité normale).
 
-### 🚲 Séparation e-bike / mécanique  
+### 🚲 Séparation e-bike / mécanique
 Les vélos électriques (**ebike**) et mécaniques (**mechanical**) sont comptés séparément.
 
-### 📊 Indicateurs clés (KPI)  
-Totaux de vélos, d’e-bikes, de stations actives et de bornes libres.
+### 📊 Indicateurs clés (KPI)
+Totaux de vélos, d'e-bikes, de stations actives et de bornes libres.
 
-### 📍 Recherche géographique  
+### 📍 Recherche géographique
 Permet de saisir une adresse pour trouver la station la plus proche.
 
-### 🚶 Itinéraire automatique  
-Affiche un trajet piéton et la durée estimée grâce à l’API OSRM.
+### 🚶 Itinéraire automatique
+Affiche un trajet piéton et la durée estimée grâce à l'API OSRM.
+
+### 🔮 Prédiction de la demande
+Prédit, pour une station choisie, le nombre de départs de vélos attendus à chaque heure de la journée. Le modèle (LightGBM) est entraîné sur plus de 14 millions de trajets historiques, traités par blocs (chunked processing) pour gérer le volume de données, et atteint une erreur absolue moyenne (MAE) de 4.58 départs/heure.
 
 ## 🧰 Technologies
-- **Langage :** Python 3.12  
-- **Framework :** Streamlit  
-- **Librairies principales :** pandas, folium, requests  
+- **Langage :** Python 3.12
+- **Framework :** Streamlit
+- **Librairies principales :** pandas, folium, requests
+- **Machine Learning :** LightGBM, scikit-learn, joblib
 - **API :** GBFS (BIXI Montréal), OSRM (itinéraires)

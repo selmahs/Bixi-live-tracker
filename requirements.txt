@@ -1,7 +1,10 @@
 #dependances a installer
 # pip install -r requirements.txt
-streamlit==1.24.1
-requests==2.31.0
-pandas==2.2.4
-folium==0.14.0
-geopy==2.4.0
+streamlit
+requests
+pandas
+folium
+geopy
+scikit-learn 
+joblib 
+lightgbm
