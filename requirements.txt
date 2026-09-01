@@ -8,3 +8,4 @@ geopy
 scikit-learn 
 joblib 
 lightgbm
+torch
