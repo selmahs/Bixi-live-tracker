@@ -8,104 +8,184 @@
 
 ## Ce que le projet fait
 
-BIXI Live Tracker est un site web interactif construit avec Streamlit.
-Il affiche en temps réel la disponibilité des vélos dans les stations BIXI de Montréal, à partir du flux officiel GBFS (General Bikeshare Feed Specification).<br>
+BIXI Live Tracker est une application web interactive construite avec **Streamlit**.
 
-Le site permet de :<br>
+Elle affiche en temps réel la disponibilité des vélos dans les stations BIXI de Montréal à partir du flux officiel **GBFS (General Bikeshare Feed Specification)**.
 
-- Visualiser toutes les stations sur une carte dynamique.<br>
+Le site permet de :
 
-- Distinguer les vélos mécaniques et les vélos électriques (e-bikes).<br>
-
-- Trouver la station la plus proche pour louer ou retourner un vélo.<br>
-
-- Consulter des indicateurs clés sur la flotte BIXI en direct.<br>
-
-- Prédire la demande horaire de vélos par station à partir de l'historique des trajets.<br>
+* Visualiser toutes les stations BIXI sur une carte dynamique.
+* Distinguer les vélos mécaniques et les vélos électriques.
+* Trouver la station la plus proche pour louer ou retourner un vélo.
+* Consulter des indicateurs clés sur la flotte BIXI en direct.
+* Prédire la demande horaire de vélos pour une station à partir de données historiques.
+* Comparer les performances de deux approches de Machine Learning : **LightGBM** et un **réseau de neurones MLP développé avec PyTorch**.
 
 ## Pourquoi le projet est utile
 
-Ce projet permet de visualiser en temps réel la disponibilité des vélos BIXI à Montréal.
-Il facilite la planification des déplacements urbains en aidant les utilisateurs à trouver rapidement une station avec des vélos ou des bornes libres à proximité.
-Le projet permet aussi de choisir entre un vélo mécanique ou un e-bike, afin d'afficher seulement les stations qui en offrent.
-La fonctionnalité de prédiction aide en plus à anticiper les heures de forte demande à une station donnée, avant même de s'y déplacer.
+Ce projet facilite la planification des déplacements à vélo à Montréal en combinant des **données temps réel**, de la **géolocalisation** et du **Machine Learning**.
+
+L'utilisateur peut rapidement identifier une station disposant de vélos ou de bornes libres à proximité et choisir entre un vélo mécanique ou électrique.
+
+La fonctionnalité de prédiction permet également d'anticiper la demande horaire pour une station donnée.
+
+Le projet explore deux approches de prédiction différentes afin d'évaluer leur performance sur les données historiques BIXI : un modèle de gradient boosting **LightGBM** et un réseau de neurones **PyTorch MLP avec embedding des stations**.
 
 ## Prise en main du projet
 
-<ins> Installation :</ins> <br>
+### Installation
 
-```
+```bash
 # Cloner le dépôt
 git clone https://github.com/<votre-nom>/bixi-live-tracker.git
 cd bixi-live-tracker
 
 # Créer un environnement virtuel
 python -m venv .venv
-source .venv/bin/activate  # macOS/Linux
-.venv\Scripts\activate     # Windows
+
+# macOS/Linux
+source .venv/bin/activate
+
+# Windows
+.venv\Scripts\activate
 
 # Installer les dépendances
 pip install -r requirements.txt
-
 ```
-<ins>Lancement de l'application:</ins> <br>
 
-```
+### Lancement de l'application
+
+```bash
 streamlit run app.py
 ```
-Le site sera accessible sur<br>
-👉 http://localhost:8501
 
-<ins>Entraîner le modèle de prédiction (optionnel) :</ins> <br>
+Le site sera accessible sur :
 
-Un modèle pré-entraîné (`model.pkl`) est nécessaire pour que la section prédiction de l'application fonctionne. Pour le générer :
+http://localhost:8501
 
-```
-# Télécharger les données de trajets historiques sur https://bixi.com/en/open-data/
-# et placer le(s) fichier(s) CSV dans le dossier data/
+## Entraînement des modèles
 
+Les modèles sont entraînés à partir des données historiques de trajets publiées par BIXI Montréal.
+
+Télécharger les fichiers CSV depuis :
+
+https://bixi.com/en/open-data/
+
+Puis les placer dans un dossier `data/`.
+
+### LightGBM
+
+```bash
 python train_model.py --data-dir data --output model.pkl
 ```
 
+Le modèle LightGBM est utilisé pour générer les prédictions affichées dans l'application.
+
+### PyTorch MLP
+
+```bash
+python train_model_pytorch.py --data-dir data --output model_pytorch.pt
+```
+
+Le second modèle est un réseau de neurones **MLP développé avec PyTorch**.
+
+Un embedding est utilisé pour représenter les différentes stations BIXI avant de combiner cette représentation avec des variables temporelles comme :
+
+* l'heure ;
+* le jour de la semaine ;
+* le mois ;
+* le statut semaine / fin de semaine.
+
+Ce modèle est principalement utilisé afin de comparer une approche neuronale avec LightGBM sur le même problème de prédiction.
+
 ## Données exploitées
 
-Le site repose sur des données ouvertes fournies par BIXI Montréal via la spécification GBFS (General Bikeshare Feed Specification) — un standard mondial utilisé par la plupart des services de vélopartage.<br>
+### Données en temps réel
 
-📡 Source principale (temps réel) :<br>
-GBFS_INDEX = "https://gbfs.velobixi.com/gbfs/2-2/gbfs.json"<br>
+Le site repose sur les données ouvertes fournies par BIXI Montréal via la spécification **GBFS (General Bikeshare Feed Specification)**.
 
-Cette URL agit comme un index qui liste tous les flux JSON publics disponibles (sous licence open data), notamment :
+Source principale :
 
-station_information.json → contient les métadonnées de chaque station (nom, coordonnées, capacité totale, etc.)
+```text
+https://gbfs.velobixi.com/gbfs/2-2/gbfs.json
+```
 
-station_status.json → fournit l'état en temps réel des stations (vélos disponibles, bornes libres, types de vélos, etc.)
+Ce flux fournit notamment :
 
-📊 Source pour la prédiction (historique) :<br>
-Le modèle de prédiction de la demande est entraîné sur les données de trajets historiques publiées annuellement par BIXI sur [bixi.com/en/open-data](https://bixi.com/en/open-data/).
+* `station_information.json` : métadonnées des stations, coordonnées et capacité ;
+* `station_status.json` : vélos disponibles, bornes libres et types de vélos.
+
+### Données historiques
+
+Les modèles de prédiction sont entraînés sur les données historiques de trajets publiées annuellement par BIXI Montréal.
+
+Les fichiers contenant plusieurs millions de trajets sont traités par blocs afin de limiter l'utilisation de la mémoire lors du prétraitement.
 
 ## Fonctionnalités principales
 
 ### 🗺️ Carte interactive
-Affiche toutes les stations BIXI avec un code couleur : rouge (aucun vélo), orange (peu de vélos), vert (disponibilité normale).
 
-### 🚲 Séparation e-bike / mécanique
-Les vélos électriques (**ebike**) et mécaniques (**mechanical**) sont comptés séparément.
+Affiche les stations BIXI de Montréal avec leur disponibilité en temps réel.
 
-### 📊 Indicateurs clés (KPI)
-Totaux de vélos, d'e-bikes, de stations actives et de bornes libres.
+Un code couleur permet d'identifier rapidement les stations selon le nombre de vélos disponibles.
+
+### 🚲 Vélos électriques et mécaniques
+
+Les vélos électriques (`ebike`) et mécaniques (`mechanical`) sont comptabilisés séparément.
+
+L'utilisateur peut choisir le type de vélo recherché.
+
+### 📊 Indicateurs clés
+
+L'application affiche notamment :
+
+* le nombre total de vélos disponibles ;
+* le nombre de vélos électriques disponibles ;
+* le nombre de stations disposant de vélos ;
+* le nombre de stations disposant de bornes libres.
 
 ### 📍 Recherche géographique
-Permet de saisir une adresse pour trouver la station la plus proche.
+
+L'utilisateur peut entrer une adresse afin de rechercher automatiquement une station BIXI appropriée à proximité.
 
 ### 🚶 Itinéraire automatique
-Affiche un trajet piéton et la durée estimée grâce à l'API OSRM.
+
+Un itinéraire jusqu'à la station choisie ainsi qu'une estimation de la durée du trajet sont obtenus grâce à l'API **OSRM**.
 
 ### 🔮 Prédiction de la demande
-Prédit, pour une station choisie, le nombre de départs de vélos attendus à chaque heure de la journée. Le modèle (LightGBM) est entraîné sur plus de 14 millions de trajets historiques, traités par blocs (chunked processing) pour gérer le volume de données, et atteint une erreur absolue moyenne (MAE) de 4.58 départs/heure.
+
+Le modèle LightGBM prédit le nombre de départs attendus pour chaque heure de la journée à une station sélectionnée.
+
+Le modèle est entraîné sur plus de **14 millions de trajets historiques**, traités par blocs afin de gérer efficacement le volume de données.
+
+Sur les données de test, LightGBM obtient :
+
+* **MAE : 4.58 départs/heure**
+* **RMSE : 7.30 départs/heure**
+
+### 🧠 Comparaison des modèles
+
+Deux architectures ont été évaluées sur la même tâche de prédiction :
+
+| Modèle      |      MAE |     RMSE |
+| ----------- | -------: | -------: |
+| LightGBM    | **4.58** | **7.30** |
+| PyTorch MLP |     6.44 |    10.86 |
+
+Le modèle PyTorch est un réseau de neurones MLP utilisant un **embedding des stations** afin de représenter les centaines de stations BIXI.
+
+Dans cette expérimentation, **LightGBM obtient de meilleures performances sur les données de test** et est donc retenu comme modèle principal pour les prédictions affichées dans l'application.
+
+Cette comparaison permet d'évaluer concrètement deux familles de modèles différentes sur des données tabulaires structurées.
 
 ## 🧰 Technologies
-- **Langage :** Python 3.12
-- **Framework :** Streamlit
-- **Librairies principales :** pandas, folium, requests
-- **Machine Learning :** LightGBM, scikit-learn, joblib
-- **API :** GBFS (BIXI Montréal), OSRM (itinéraires)
+
+* **Langage :** Python 3.12
+* **Application web :** Streamlit
+* **Traitement de données :** pandas, NumPy
+* **Cartographie :** Folium, streamlit-folium
+* **Machine Learning :** LightGBM, scikit-learn
+* **Deep Learning :** PyTorch
+* **Sérialisation :** joblib, torch
+* **APIs :** GBFS BIXI Montréal, OSRM
+* **Données :** données temps réel GBFS et historique des trajets BIXI
