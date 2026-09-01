@@ -3,7 +3,9 @@
 ## Aperçu du projet
 
 <p align="center">
+
   <img src="./apercuSite.png" alt="Aperçu du site BIXI Live Tracker" width="600">
+
 </p>
 
 ## Ce que le projet fait
@@ -37,19 +39,25 @@ Le projet explore deux approches de prédiction différentes afin d'évaluer leu
 
 ```bash
 # Cloner le dépôt
+
 git clone https://github.com/<votre-nom>/bixi-live-tracker.git
+
 cd bixi-live-tracker
 
 # Créer un environnement virtuel
+
 python -m venv .venv
 
 # macOS/Linux
+
 source .venv/bin/activate
 
 # Windows
+
 .venv\Scripts\activate
 
 # Installer les dépendances
+
 pip install -r requirements.txt
 ```
 
@@ -123,19 +131,19 @@ Les fichiers contenant plusieurs millions de trajets sont traités par blocs afi
 
 ## Fonctionnalités principales
 
-### 🗺️ Carte interactive
+### Carte interactive
 
 Affiche les stations BIXI de Montréal avec leur disponibilité en temps réel.
 
 Un code couleur permet d'identifier rapidement les stations selon le nombre de vélos disponibles.
 
-### 🚲 Vélos électriques et mécaniques
+### Vélos électriques et mécaniques
 
 Les vélos électriques (`ebike`) et mécaniques (`mechanical`) sont comptabilisés séparément.
 
 L'utilisateur peut choisir le type de vélo recherché.
 
-### 📊 Indicateurs clés
+### Indicateurs clés
 
 L'application affiche notamment :
 
@@ -144,15 +152,15 @@ L'application affiche notamment :
 * le nombre de stations disposant de vélos ;
 * le nombre de stations disposant de bornes libres.
 
-### 📍 Recherche géographique
+### Recherche géographique
 
 L'utilisateur peut entrer une adresse afin de rechercher automatiquement une station BIXI appropriée à proximité.
 
-### 🚶 Itinéraire automatique
+### Itinéraire automatique
 
 Un itinéraire jusqu'à la station choisie ainsi qu'une estimation de la durée du trajet sont obtenus grâce à l'API **OSRM**.
 
-### 🔮 Prédiction de la demande
+### Prédiction de la demande
 
 Le modèle LightGBM prédit le nombre de départs attendus pour chaque heure de la journée à une station sélectionnée.
 
@@ -163,10 +171,12 @@ Sur les données de test, LightGBM obtient :
 * **MAE : 4.58 départs/heure**
 * **RMSE : 7.30 départs/heure**
 
-### 🧠 Comparaison des modèles
+### Comparaison des modèles
 
 <p align="center">
-  <img src="./apercuComparaison.png" alt="Aperçu du site BIXI Live Tracker" width="600">
+
+  <img src="./apercuComparaison.png" alt="Aperçu de la comparaison des modèles" width="600">
+
 </p>
 
 Deux architectures ont été évaluées sur la même tâche de prédiction :
@@ -182,7 +192,7 @@ Dans cette expérimentation, **LightGBM obtient de meilleures performances sur l
 
 Cette comparaison permet d'évaluer concrètement deux familles de modèles différentes sur des données tabulaires structurées.
 
-## 🧰 Technologies
+## Technologies
 
 * **Langage :** Python 3.12
 * **Application web :** Streamlit
