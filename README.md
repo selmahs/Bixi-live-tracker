@@ -165,6 +165,10 @@ Sur les données de test, LightGBM obtient :
 
 ### 🧠 Comparaison des modèles
 
+<p align="center">
+  <img src="./apercuComparaison.png" alt="Aperçu du site BIXI Live Tracker" width="600">
+</p>
+
 Deux architectures ont été évaluées sur la même tâche de prédiction :
 
 | Modèle      |      MAE |     RMSE |
